@@ -7,10 +7,105 @@
 </head>
 <body>
 
-    <h1>Documentation page</h1>
+    <h2>Endpoints</h2>
 
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde temporibus eum repellendus cupiditate, amet porro accusamus qui asperiores molestias ad quaerat, eos animi aliquam facilis soluta ipsum illo velit officiis!
-    Architecto laudantium, facilis fugiat sed aperiam unde, quia aliquid voluptates veritatis sapiente eligendi ab. Quo beatae omnis ipsum natus doloremque debitis quia dolores voluptatibus dignissimos ipsa, voluptas eos est itaque!</p>
-    
+    <table bgcolor="grey" width="1000" height="700">
+        <tr bgcolor="lightgrey" align="center">
+            <th width="100">Request</th>
+            <th width="200">URL</th>
+            <th width="300">Business logic</th>
+            <th width="300">Request data format</th>
+            <th width="300">Response data format</th>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Post</td>
+            <td>/users</td>
+            <td>Create an account</td>
+            <td>{
+                "name": "Joe",
+                "favoriteMovies": []
+            }
+        </td>
+            <td>{
+                "name": "Joe",
+                "favoriteMovies": [],
+                "id": "xyz"
+            }</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Put</td>
+            <td>/users/:id</td>
+            <td>Update or change username</td>
+            <td>{
+                "name": "Bonnie Updated",
+                "favoriteMovies": []
+              }</td>
+            <td>{
+                "id": xyz,
+                "name": "Bonnie Updated",
+                "favoriteMovies": []
+            }</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Post</td>
+            <td>/users/:id/:movieTitle</td>
+            <td>Add a movie to the list of favorites</td>
+            <td>None</td>
+            <td>A text message indicating that the movie was added to the list of user</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Delete</td>
+            <td>/users/:id/:movieTitle</td>
+            <td>Removes a movie from the list of favorites</td>
+            <td>None</td>
+            <td>A text message indicating that the movie was removed from the list of the user</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/movies</td>
+            <td>Shows a list of all movies</td>
+            <td>None</td>
+            <td>A JSON object holding the data of all movies</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/movies/:title</td>
+            <td>Get a movie by title</td>
+            <td>None</td>
+            <td>A JSON object holding the information of the requested movie</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/movies/genre/:genreName</td>
+            <td>Get a movie by genre</td>
+            <td>None</td>
+            <td>A JSON object holding information of the requested movie searched by genre</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/movies/directors/:directorName</td>
+            <td>Get a movie by Director's name</td>
+            <td>None</td>
+            <td>A JSON object holding information of the requested movie searched by director's name</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Delete</td>
+            <td>/users/:id</td>
+            <td>Delete an account</td>
+            <td>None</td>
+            <td>A text message that confirms the account deletion</td>
+        </tr>
+
+        
+    </table>    
 </body>
 </html>
