@@ -19,50 +19,86 @@
         </tr>
 
         <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/</td>
+            <td>Goes to the Home Page</td>
+            <td>None</td>
+            <td>Redirected to home Page</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/users</td>
+            <td>Shows a list of all users</td>
+            <td>None</td>
+            <td>A JSON object holding the data of every single account</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
+            <td>Get</td>
+            <td>/users/:Username</td>
+            <td>Gets a user information</td>
+            <td>None</td>
+            <td>A JSON object holding the data of the requested account</td>
+        </tr>
+
+        <tr bgcolor="white" align="center">
             <td>Post</td>
             <td>/users</td>
             <td>Create an account</td>
             <td>{
-                "name": "Joe",
-                "favoriteMovies": []
+                "Username": "Joe",
+                "Password": "test",
+                "Email": "test@example.com",
+                "Birthday": "MM-DD-YY"
+                "FavoriteMovies": []
             }
         </td>
             <td>{
-                "name": "Joe",
-                "favoriteMovies": [],
-                "id": "xyz"
+                "id": "rng",
+                "Username": "Joe",
+                "Password": "test",
+                "Email": "test@example.com",
+                "Birthday": "MM-DD-YY"
+                "FavoriteMovies": []
             }</td>
         </tr>
 
         <tr bgcolor="white" align="center">
             <td>Put</td>
-            <td>/users/:id</td>
+            <td>/users/:Username</td>
             <td>Update or change username</td>
             <td>{
-                "name": "Bonnie Updated",
-                "favoriteMovies": []
-              }</td>
+                "Username": "Joe",
+                "Password": "test",
+                "Email": "test@example.com",
+                "Birthday": "MM-DD-YY"
+                "FavoriteMovies": []
+            }</td>
             <td>{
-                "id": xyz,
-                "name": "Bonnie Updated",
-                "favoriteMovies": []
+                "id": "unchanged",
+                "Username": "Joe",
+                "Password": "test",
+                "Email": "test@example.com",
+                "Birthday": "MM-DD-YY"
+                "FavoriteMovies": []
             }</td>
         </tr>
 
         <tr bgcolor="white" align="center">
             <td>Post</td>
-            <td>/users/:id/:movieTitle</td>
+            <td>/users/:Username/movies/:MovieID</td>
             <td>Add a movie to the list of favorites</td>
             <td>None</td>
-            <td>A text message indicating that the movie was added to the list of user</td>
+            <td>A JSON object holding the data of the account. The ID of the movie will be added in "FavoriteMovies"</td>
         </tr>
 
         <tr bgcolor="white" align="center">
             <td>Delete</td>
-            <td>/users/:id/:movieTitle</td>
+            <td>/users/:Username/movies/:MovieID</td>
             <td>Removes a movie from the list of favorites</td>
             <td>None</td>
-            <td>A text message indicating that the movie was removed from the list of the user</td>
+            <td>A JSON object holding the data of the account. The ID of the movie will be removed from "FavoriteMovies"</td>
         </tr>
 
         <tr bgcolor="white" align="center">
@@ -75,7 +111,7 @@
 
         <tr bgcolor="white" align="center">
             <td>Get</td>
-            <td>/movies/:title</td>
+            <td>/movies/:Title</td>
             <td>Get a movie by title</td>
             <td>None</td>
             <td>A JSON object holding the information of the requested movie</td>
@@ -84,22 +120,22 @@
         <tr bgcolor="white" align="center">
             <td>Get</td>
             <td>/movies/genre/:genreName</td>
-            <td>Get a movie by genre</td>
+            <td>Get information about a certain genre</td>
             <td>None</td>
-            <td>A JSON object holding information of the requested movie searched by genre</td>
+            <td>A JSON object holding a description of the requested genre</td>
         </tr>
 
         <tr bgcolor="white" align="center">
             <td>Get</td>
             <td>/movies/directors/:directorName</td>
-            <td>Get a movie by Director's name</td>
+            <td>Get information about a Director</td>
             <td>None</td>
-            <td>A JSON object holding information of the requested movie searched by director's name</td>
+            <td>A JSON object holding information of the requested Director</td>
         </tr>
 
         <tr bgcolor="white" align="center">
             <td>Delete</td>
-            <td>/users/:id</td>
+            <td>/users/:Username</td>
             <td>Delete an account</td>
             <td>None</td>
             <td>A text message that confirms the account deletion</td>
