@@ -1,4 +1,4 @@
-//Requiring mongoose and model.js
+//Requiring MONGOOSE and model.js
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 
@@ -8,30 +8,57 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 const bodyParser = require('body-parser');
-//Requiring express and uuid
+//Requiring EXPRESS and UUID
 const express = require('express'),
   morgan = require('morgan'),
   uuid = require('uuid');
 
 const app = express();
 
-//Middleware
+//CORS
+const cors = require('cors');
+app.use(cors());
+
+let auth = require('./auth.js')(app);
+//PASSPORT
+const passport = require('passport');
+require('./passport.js');
+
+//Express validator
+const { check, validationResult } = require('express-validator');
+
+//MORGAN
 app.use(morgan('common'));
 
-//Express static function
+//EXPRESS static function
 app.use(express.static('public'));
 
 app.use(bodyParser.json());
 
-let auth = require('./auth.js')(app);
 
-const passport = require('passport');
-require('./passport.js');
+
+
 
       //CREATE
 
       //CREATE or POST - Create a new account/ Registration
-      app.post('/users', async (req, res) => {
+      app.post('/users',
+        //Validation logic
+        [
+          check('Username', 'Username is required').isLength({min: 5}),
+          check('Username', 'Username contains non alphanumeric characters - Not allowed.').isAlphanumeric(),
+          check('Password', 'Password is required').not().isEmpty(),
+          check('Email', 'Email appears to be invalid').isEmail()
+        ],  async (req, res) => {
+
+          //Checks for validation errors
+          let errors = validationResult(req);
+
+          if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+          }
+
+        let hashedPassword = Users.hashPassword(req.body.Password);
         await Users.findOne({ Username: req.body.Username })
           .then((user) => {
             if (user) {
@@ -40,7 +67,7 @@ require('./passport.js');
               Users
                 .create({
                   Username: req.body.Username,
-                  Password: req.body.Password,
+                  Password: hashedPassword,
                   Email: req.body.Email,
                   Birthday: req.body.Birthday
                 })
@@ -48,7 +75,7 @@ require('./passport.js');
               .catch((error) => {
                 console.error(error);
                 res.status(500).send('Error: ' + error);
-              })
+              });
             }
           })
           .catch((error) => {
@@ -144,12 +171,27 @@ require('./passport.js');
       //UPDATE
 
       //Update or change the username
-        app.put('/users/:Username', passport.authenticate('jwt', {session: false}), async (req, res) => {
+        app.put('/users/:Username', passport.authenticate('jwt', {session: false}),
+
+        [
+          check('Username', 'Username is required').isLength({min: 5}),
+          check('Username', 'Username contains non alphanumeric characters - Not allowed.').isAlphanumeric(),
+          check('Password', 'Password is required').not().isEmpty(),
+          check('Email', 'Email appears to be invalid').isEmail()
+        ],  async (req, res) => {
+
+          //Checks for validation errors
+          let errors = validationResult(req);
+
+          if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+          }
+        
           //Condition to check if same user is making the put request
           if(req.user.Username !== req.params.Username){
             return res.status(400).send('Permission denied');
         }
-        
+
       await Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
           {
             Username: req.body.Username,
@@ -226,6 +268,7 @@ require('./passport.js');
       });
 
 //port that listens for requests
-app.listen(8080, () => {
-    console.log("App is listening on port 8080.")
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+  console.log('Listening on Port ' + port);
 });
