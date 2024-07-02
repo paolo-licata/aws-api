@@ -1,11 +1,7 @@
-//Requiring MONGOOSE and model.js
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 
-// mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
-
 mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -23,24 +19,17 @@ const cors = require('cors');
 app.use(cors());
 
 let auth = require('./auth.js')(app);
+
 //PASSPORT
 const passport = require('passport');
 require('./passport.js');
 
-//Express validator
 const { check, validationResult } = require('express-validator');
-
-//MORGAN
 app.use(morgan('common'));
 
-//EXPRESS static function
 app.use(express.static('public'));
 
 app.use(bodyParser.json());
-
-
-
-
 
       //CREATE
 
@@ -170,7 +159,6 @@ app.use(bodyParser.json());
           });
       });
 
-
       //UPDATE
 
       //Update or change the username
@@ -261,8 +249,6 @@ app.use(bodyParser.json());
           res.status(500).send('Error: ' + err);
         });
     });
-
-           
 
             //Error handler
       app.use((err, req, res, next) => {
