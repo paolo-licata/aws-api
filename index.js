@@ -1,34 +1,41 @@
-const mongoose = require('mongoose');
-const Models = require('./models.js');
+const express = require("express");
+const morgan = require("morgan");
+const uuid = require("uuid");
+const bcrypt = require("bcrypt");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const Models = require("./models.js");
+const passport = require("passport");
+require("./passport");
+const { check, validationResult } = require("express-validator");
+
+const app = express();
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-const bodyParser = require('body-parser');
-//Requiring EXPRESS and UUID
-const express = require('express'),
-  morgan = require('morgan'),
-  uuid = require('uuid');
+let auth = require("./auth")(app);
 
-const app = express();
+// CORS configuration
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-//CORS
-const cors = require('cors');
-app.use(cors());
+app.use(cors(corsOptions));
 
-const { check, validationResult } = require('express-validator');
-app.use(morgan('common'));
+app.options("*", cors(corsOptions));
 
-app.use(express.static('public'));
+app.use((req, res, next) => {
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-let auth = require('./auth.js')(app);
-
-//PASSPORT
-const passport = require('passport');
-require('./passport.js');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
 mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
