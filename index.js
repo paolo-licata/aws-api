@@ -1,18 +1,16 @@
-const express = require("express");
-const morgan = require("morgan");
-const uuid = require("uuid");
-const bcrypt = require("bcrypt");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const Models = require("./models.js");
-const passport = require("passport");
-require("./passport");
-const { check, validationResult } = require("express-validator");
-
-const app = express();
+const mongoose = require('mongoose');
+const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
+
+const bodyParser = require('body-parser');
+//Requiring EXPRESS and UUID
+const express = require('express'),
+  morgan = require('morgan'),
+  uuid = require('uuid');
+
+const app = express();
 
 //CORS
 const cors = require('cors');
@@ -33,8 +31,6 @@ const passport = require('passport');
 require('./passport.js');
 
 mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-
 
       //CREATE
 
