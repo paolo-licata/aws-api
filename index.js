@@ -14,28 +14,23 @@ const app = express();
 const Movies = Models.Movie;
 const Users = Models.User;
 
-let auth = require("./auth")(app);
-
-// CORS configuration
-//const corsOptions = {
-//  origin: "*",
-//  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//  allowedHeaders: ["Content-Type", "Authorization"],
-//  credentials: true,
-//};
-
+//CORS
+const cors = require('cors');
 app.use(cors());
 
-//app.options("*", cors(corsOptions));
+const { check, validationResult } = require('express-validator');
+app.use(morgan('common'));
 
-//app.use((req, res, next) => {
-//  console.log("Request Origin:", req.headers.origin);
-//  next();
-//});
+app.use(express.static('public'));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+let auth = require('./auth.js')(app);
+
+//PASSPORT
+const passport = require('passport');
+require('./passport.js');
 
 mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
