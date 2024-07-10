@@ -17,16 +17,16 @@ const Users = Models.User;
 let auth = require("./auth")(app);
 
 // CORS configuration
-const corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
+//const corsOptions = {
+//  origin: "*",
+//  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//  allowedHeaders: ["Content-Type", "Authorization"],
+//  credentials: true,
+//};
 
-app.use(cors(corsOptions));
+app.use(cors());
 
-app.options("*", cors(corsOptions));
+//app.options("*", cors(corsOptions));
 
 app.use((req, res, next) => {
   console.log("Request Origin:", req.headers.origin);
