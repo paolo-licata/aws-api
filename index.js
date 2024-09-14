@@ -45,7 +45,11 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
 
       //CREATE
 
-      //CREATE or POST - Create a new account/ Registration
+      /**
+       * Creation of a new account
+       * Username must be at least 5 characters 
+       * Password and email have to be valid
+       */
       app.post('/users',
         //Validation logic
         [
@@ -90,7 +94,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
 
       //READ
 
-      //GET requests
+      /**
+       * Home page of the server
+       */
       app.get('/', (req, res) => {
         res.send("<h1>Welcome to myFlix!</h1>")
       });
@@ -99,7 +105,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
         res.sendFile('public/documentation.html', {root: __dirname});
       });
 
-      //GET a list of all users
+      /**
+       * Returns a list of all the users registered and currently using the service
+       */
       app.get('/users', passport.authenticate('jwt', {session: false}), async (req, res) => {
         await Users.find()
           .then((users) => {
@@ -111,7 +119,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
           });
       });
 
-      // Get a user by username
+      /**
+       * Returns a single user by their username
+       */
       app.get('/users/:Username', passport.authenticate('jwt', {session: false}), async (req, res) => {
         await Users.findOne({ Username: req.params.Username })
           .then((user) => {
@@ -123,7 +133,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
           });
       });
 
-      //GET a list of all movies
+      /**
+       * Returns a list of all the movies currently stored in the database
+       */
       app.get('/movies', passport.authenticate('jwt', {session: false}), (req, res) => {
         Movies.find()
           .then((movies) => {
@@ -135,7 +147,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
           });
       });
 
-      //GET a movie by movie title
+      /**
+       * Return a single movie by its title
+       */
       app.get('/movies/:Title', passport.authenticate('jwt', {session: false}), (req, res) => {
         Movies.findOne({ Title: req.params.Title })
           .then((movies) => {
@@ -147,7 +161,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
           });
       });
 
-      //GET a description of specific genre
+      /**
+       * Returns a short description of the genre ( name and description )
+       */
       app.get('/movies/genre/:genreName', passport.authenticate('jwt', {session: false}), (req, res) => {
         Movies.findOne({ "Genre.Name": req.params.genreName })
           .then((movie) => {
@@ -159,7 +175,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
           });
       });
 
-      //GET information on a Director 
+      /**
+       * Returns information about a specific director ( name and bio )
+       */
       app.get('/movies/directors/:directorName', passport.authenticate('jwt', {session: false}), (req, res) => {
         Movies.findOne({ "Director.Name": req.params.directorName })
           .then((movie) => {
@@ -173,7 +191,12 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
 
       //UPDATE
 
-      //Update or change the username
+      /**
+       * Allows to update information about the user.
+       * Just like registration,
+       * username has to be at least 5 characters long and
+       * password and email have to be valid
+       */
         app.put('/users/:Username', passport.authenticate('jwt', {session: false}),
 
         [
@@ -214,7 +237,10 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
 
       });
 
-      //Adds a new movie to user's favorites array
+      /**
+       * Allows the user to store a movie ( pulled by its ID )
+       * to their favorite movies array
+       */
       app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', {session: false}), async (req, res) => {
         await Users.findOneAndUpdate({ Username: req.params.Username }, {
            $push: { FavoriteMovies: req.params.MovieID }
@@ -231,7 +257,10 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
 
       //DELETE
 
-      //Deletes or removes a movie from user's favorites array
+      /**
+       * Allows the user to remove a movie ( pulled by its ID )
+       * from their favorite movies array
+       */
       app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', {session: false}), async (req, res) => {
         await Users.findOneAndUpdate({ Username: req.params.Username }, {
            $pull: { FavoriteMovies: req.params.MovieID }
@@ -246,7 +275,9 @@ mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifie
         });
       });
 
-      // Delete a user by username / Deregister
+      /**
+       * Allows the user to de-register or delete their account from the service
+       */
       app.delete('/users/:Username', passport.authenticate('jwt', {session: false}), (req, res) => {
         Users.findOneAndDelete({ Username: req.params.Username })
         .then((user) => {
