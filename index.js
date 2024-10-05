@@ -1,4 +1,17 @@
+require('dotenv').config(); // Load environment variables from .env file
 const mongoose = require('mongoose');
+
+const dbUri = process.env.DB_HOST; // Fetch the DB_HOST from environment variables
+
+mongoose.connect(dbUri)
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch(err => {
+        console.error('Error connecting to MongoDB:', err);
+    });
+
+
 const Models = require('./models.js');
 
 const Movies = Models.Movie;
@@ -41,7 +54,6 @@ let auth = require('./auth.js')(app);
 const passport = require('passport');
 require('./passport.js');
 
-mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
       //CREATE
 
