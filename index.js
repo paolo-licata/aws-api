@@ -27,7 +27,15 @@ const app = express();
 
 //CORS
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://myflix-cfoundry.netlify.app', 'http://localhost:4200', 'https://paolo-licata.github.io'];
+let allowedOrigins = [
+  'http://localhost:8080',
+  'http://localhost:1234',
+  'https://myflix-cfoundry.netlify.app',
+  'http://localhost:4200',
+  'https://paolo-licata.github.io',
+  'http://18.184.165.32',
+  'http://myflix-app-bucket.s3-website.eu-central-1.amazonaws.com'
+];
 
 app.use(cors({
   origin: (origin, callback) => {
