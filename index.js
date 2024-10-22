@@ -1,4 +1,5 @@
 require('dotenv').config(); // Load environment variables from .env file
+const { S3Client, PutObjectCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const mongoose = require('mongoose');
 
 const dbUri = process.env.DB_HOST; // Fetch the DB_HOST from environment variables
@@ -10,7 +11,6 @@ mongoose.connect(dbUri)
     .catch(err => {
         console.error('Error connecting to MongoDB:', err);
     });
-
 
 const Models = require('./models.js');
 
@@ -27,26 +27,7 @@ const app = express();
 
 //CORS
 const cors = require('cors');
-let allowedOrigins = [
-  'http://localhost:8080',
-  'http://localhost:1234',
-  'https://myflix-cfoundry.netlify.app',
-  'http://localhost:4200',
-  'https://paolo-licata.github.io',
-  'http://18.184.165.32',
-  'http://myflix-app-bucket.s3-website.eu-central-1.amazonaws.com'
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      let message = 'The CORS policy for this application does not allow access from origin' + origin;
-      return callback(new Error(message), false);
-    }
-    return callback(null, true);
-  }
-}));
+app.use(cors());
 
 const { check, validationResult } = require('express-validator');
 app.use(morgan('common'));
@@ -56,12 +37,86 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//Configuration of S3
+const fs = require('fs');
+const fileUpload = require('express-fileupload');
+const path = require('path');
+
+app.use(fileUpload());
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION || 'eu-central-1',
+});
+
+// Serve the static index.html file
+app.get('/index', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Endpoint to list images in the S3 bucket
+app.get('/images', async (req, res) => {
+  const listObjectsParams = {
+      Bucket: process.env.S3_BUCKET_NAME || 'aws-bucket-for-cf'
+  };
+
+  try {
+      const listObjectsResponse = await s3Client.send(new ListObjectsV2Command(listObjectsParams));
+      res.send(listObjectsResponse);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Error fetching images: ' + error.message);
+  }
+});
+
+const UPLOAD_TEMP_PATH = 'C:\\Users\\paolo\\Desktop\\movie_api_aws\\temp';
+
+app.post('/images', async (req, res) => {
+  // Check if a file was uploaded
+  if (!req.files || !req.files.image) {
+      return res.status(400).send('No image was uploaded.');
+  }
+
+  const file = req.files.image; // The uploaded file
+  const fileName = file.name; // Original name of the uploaded file
+
+  // If you want to save it temporarily (optional), you can define a temporary path
+  const tempPath = path.join(__dirname, 'temp', fileName);
+
+  // Move the file to the temporary path
+  file.mv(tempPath, async (err) => {
+      if (err) {
+          return res.status(500).send('Error moving file: ' + err.message);
+      }
+
+      // Prepare S3 upload parameters
+      const uploadParams = {
+          Bucket: process.env.S3_BUCKET_NAME || 'aws-bucket-for-cf',
+          Key: fileName, // The name to save as in S3
+          Body: fs.createReadStream(tempPath) // Read the file from the temp path
+      };
+
+      try {
+          const command = new PutObjectCommand(uploadParams);
+          await s3Client.send(command);
+          res.status(201).send('File uploaded successfully.');
+
+          // Optionally, clean up the temporary file after uploading
+          fs.unlink(tempPath, (err) => {
+              if (err) console.error('Error deleting temp file: ', err);
+          });
+      } catch (error) {
+          console.error(error);
+          res.status(500).send('Error uploading file to S3: ' + error.message);
+      }
+  });
+});
+
+
 let auth = require('./auth.js')(app);
 
 //PASSPORT
 const passport = require('passport');
 require('./passport.js');
-
 
       //CREATE
 

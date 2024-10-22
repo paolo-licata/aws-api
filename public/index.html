@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Retrieve Images</title>
+</head>
+<body>
+    <h1>Image Upload</h1>
+
+    <!-- Upload form -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="image">Choose an image:</label>
+        <input type="file" id="image" name="image" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Uploaded Images</h2>
+    <div id="imageList"></div>
+
+    <script>
+        // Upload image
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const imageFile = document.getElementById('image').files[0];
+            formData.append('image', imageFile);
+
+            fetch('/images', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Notify user of upload success or failure
+                loadImages(); // Reload images after successful upload
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+            });
+        });
+
+        // Fetch and display uploaded images
+        function loadImages() {
+            fetch('/images')
+                .then(response => response.json())
+                .then(data => {
+                    const imageList = document.getElementById('imageList');
+                    imageList.innerHTML = ''; // Clear existing images
+
+                    if (data.Contents && data.Contents.length > 0) {
+                        data.Contents.forEach(item => {
+                            const imageUrl = `http://localhost:4566/${data.Name}/${item.Key}`;
+                            
+                            // Create image element
+                            const img = document.createElement('img');
+                            img.src = imageUrl;
+                            img.alt = item.Key;
+                            img.style.maxWidth = '200px'; // Limit image size for display
+                            
+                            // Create download link
+                            const downloadLink = document.createElement('a');
+                            downloadLink.href = imageUrl;
+                            downloadLink.download = item.Key; // Force download with original file name
+                            downloadLink.textContent = 'Download';
+                            downloadLink.style.display = 'block'; // Make it appear below the image
+
+                            // Append image and download link to the list
+                            const imageContainer = document.createElement('div');
+                            imageContainer.appendChild(img);
+                            imageContainer.appendChild(downloadLink);
+                            imageList.appendChild(imageContainer);
+                        });
+                    } else {
+                        imageList.textContent = 'No images found.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching images:', error);
+                });
+        }
+
+        // Load images on page load
+        window.onload = loadImages;
+    </script>
+</body>
+</html>
