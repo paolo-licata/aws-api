@@ -42,7 +42,9 @@ const fs = require('fs');
 const fileUpload = require('express-fileupload');
 const path = require('path');
 
-app.use(fileUpload());
+app.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 },
+}));
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || 'eu-central-1',

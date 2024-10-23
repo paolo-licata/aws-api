@@ -50,7 +50,7 @@
 
                     if (data.Contents && data.Contents.length > 0) {
                         data.Contents.forEach(item => {
-                            const imageUrl = `http://localhost:4566/${data.Name}/${item.Key}`;
+                            const imageUrl = `https://aws-bucket-for-cf.s3.amazonaws.com/${item.Key}`;
                             
                             // Create image element
                             const img = document.createElement('img');
