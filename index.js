@@ -55,20 +55,45 @@ app.get('/index', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+const IMAGE_BUCKET_NAME = 'aws-bucket-for-cf'; // explicitly set the image bucket name
+
 // Endpoint to list images in the S3 bucket
 app.get('/images', async (req, res) => {
-  const listObjectsParams = {
-      Bucket: process.env.S3_BUCKET_NAME || 'aws-bucket-for-cf'
-  };
+    const listOriginalImagesParams = {
+        Bucket: IMAGE_BUCKET_NAME, // Use the explicit bucket name for images
+        Prefix: 'original-images/',
+    };
 
-  try {
-      const listObjectsResponse = await s3Client.send(new ListObjectsV2Command(listObjectsParams));
-      res.send(listObjectsResponse);
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Error fetching images: ' + error.message);
-  }
+    const listResizedImagesParams = {
+        Bucket: IMAGE_BUCKET_NAME, // Use the explicit bucket name for images
+        Prefix: 'resized-images/',
+    };
+
+    try {
+        // Fetch original images
+        const originalImagesResponse = await s3Client.send(new ListObjectsV2Command(listOriginalImagesParams));
+        const originalImages = originalImagesResponse.Contents?.map(item => ({
+            url: `https://${IMAGE_BUCKET_NAME}.s3.eu-central-1.amazonaws.com/${item.Key}`, // update to use IMAGE_BUCKET_NAME
+            type: 'original',
+            key: item.Key,
+        })) || [];
+
+        // Fetch resized images
+        const resizedImagesResponse = await s3Client.send(new ListObjectsV2Command(listResizedImagesParams));
+        const resizedImages = resizedImagesResponse.Contents?.map(item => ({
+            url: `https://${IMAGE_BUCKET_NAME}.s3.eu-central-1.amazonaws.com/${item.Key}`, // update to use IMAGE_BUCKET_NAME
+            type: 'resized',
+            key: item.Key,
+        })) || [];
+
+        // Combine the lists and send them as a response
+        res.send([...originalImages, ...resizedImages]);
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        res.status(500).send('Error fetching images: ' + error.message);
+    }
 });
+
 
 const UPLOAD_TEMP_PATH = 'C:\\Users\\paolo\\Desktop\\movie_api_aws\\temp';
 
@@ -93,7 +118,7 @@ app.post('/images', async (req, res) => {
       // Prepare S3 upload parameters
       const uploadParams = {
           Bucket: process.env.S3_BUCKET_NAME || 'aws-bucket-for-cf',
-          Key: fileName, // The name to save as in S3
+          Key: `original-images/${fileName}`, // The name to save as in S3
           Body: fs.createReadStream(tempPath) // Read the file from the temp path
       };
 

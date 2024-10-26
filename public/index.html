@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload and Retrieve Images</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
     <h1>Image Upload</h1>
@@ -26,6 +27,7 @@
             const imageFile = document.getElementById('image').files[0];
             formData.append('image', imageFile);
 
+            // Post image to the `original-images/` folder
             fetch('/images', {
                 method: 'POST',
                 body: formData
@@ -40,39 +42,51 @@
             });
         });
 
-        // Fetch and display uploaded images
+        // Fetch and display uploaded images from both resized-images/ and original-images/
         function loadImages() {
-            fetch('/images')
+            fetch('/images') // Get images metadata
                 .then(response => response.json())
                 .then(data => {
                     const imageList = document.getElementById('imageList');
                     imageList.innerHTML = ''; // Clear existing images
 
-                    if (data.Contents && data.Contents.length > 0) {
-                        data.Contents.forEach(item => {
-                            const imageUrl = `https://aws-bucket-for-cf.s3.amazonaws.com/${item.Key}`;
-                            
-                            // Create image element
-                            const img = document.createElement('img');
-                            img.src = imageUrl;
-                            img.alt = item.Key;
-                            img.style.maxWidth = '200px'; // Limit image size for display
-                            
-                            // Create download link
-                            const downloadLink = document.createElement('a');
-                            downloadLink.href = imageUrl;
-                            downloadLink.download = item.Key; // Force download with original file name
-                            downloadLink.textContent = 'Download';
-                            downloadLink.style.display = 'block'; // Make it appear below the image
+                    // Separate arrays for originals and resized images
+                    const originals = data.filter(item => item.type === 'original');
+                    const resized = data.filter(item => item.type === 'resized');
 
-                            // Append image and download link to the list
-                            const imageContainer = document.createElement('div');
-                            imageContainer.appendChild(img);
-                            imageContainer.appendChild(downloadLink);
-                            imageList.appendChild(imageContainer);
-                        });
-                    } else {
-                        imageList.textContent = 'No images found.';
+                    // Loop through the images and display them side by side
+                    for (let i = 0; i < originals.length; i++) {
+                        const imageContainer = document.createElement('div');
+                        imageContainer.classList.add('imageContainer'); // Add this line for container styling
+
+                        // Create original image
+                        const fullImageImg = document.createElement('img');
+                        fullImageImg.classList.add('fullImage'); // Add this line for full image styling
+                        fullImageImg.src = originals[i].url;
+
+                        // Create download links
+                        const originalDownloadLink = document.createElement('a');
+                        originalDownloadLink.href = originals[i].url;
+                        originalDownloadLink.download = `original_${i + 1}.jpg`; // Set download filename
+                        originalDownloadLink.textContent = 'Download Original';
+                        originalDownloadLink.style.marginRight = '10px'; // Add some space between links
+
+                        // Create thumbnail image
+                        const thumbnailImg = document.createElement('img');
+                        thumbnailImg.classList.add('thumbnail'); // Add this line for thumbnail styling
+                        thumbnailImg.src = resized[i]?.url || ''; // Check if resized exists
+
+                        const thumbnailDownloadLink = document.createElement('a');
+                        thumbnailDownloadLink.href = resized[i]?.url || '';
+                        thumbnailDownloadLink.download = `thumbnail_${i + 1}.jpg`; // Set download filename
+                        thumbnailDownloadLink.textContent = 'Download Thumbnail';
+
+                        // Append images and links to the container
+                        imageContainer.appendChild(fullImageImg);
+                        imageContainer.appendChild(thumbnailImg);
+                        imageContainer.appendChild(originalDownloadLink);
+                        imageContainer.appendChild(thumbnailDownloadLink);
+                        imageList.appendChild(imageContainer);
                     }
                 })
                 .catch(error => {

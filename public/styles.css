@@ -1,0 +1,113 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f5f5f5;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
+}
+
+/* Headings */
+h1, h2 {
+	color: #333;
+	margin: 1rem 0;
+	text-align: center;
+}
+
+/* Upload form */
+#uploadForm {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2rem;
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	max-width: 400px;
+	width: 100%;
+}
+
+#uploadForm label {
+	font-size: 1rem;
+	color: #555;
+	margin-bottom: 0.5rem;
+}
+
+#uploadForm input[type="file"] {
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+#uploadForm button {
+	padding: 0.7rem 1.5rem;
+	font-size: 1rem;
+	color: #fff;
+	background-color: #4CAF50;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+#uploadForm button:hover {
+	background-color: #45a049;
+}
+
+/* Uploaded Images Section */
+#imageList {
+	display: flex;
+	flex-direction: column; /* Keep images stacked vertically */
+	gap: 1rem; /* Space between image containers */
+	margin-top: 1.5rem;
+	max-width: 800px;
+	width: 100%;
+	justify-content: center;
+}
+
+.imageContainer {
+	display: flex; /* Use flexbox for horizontal alignment */
+	align-items: flex-start; /* Align images to the top */
+	max-width: 700px; /* Limit max width of the container */
+	width: 100%; /* Allow it to take full width of parent */
+}
+
+#imageList img {
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease;
+}
+
+#imageList img:hover {
+	transform: scale(1.05);
+}
+
+/* Styling for download links */
+#imageList a {
+	text-decoration: none; /* Remove underline */
+	color: #4CAF50; /* Link color */
+	font-weight: bold; /* Make the text bold */
+	margin-right: 10px; /* Space between links */
+	margin-left: 10px;
+}
+
+#imageList a:hover {
+	text-decoration: underline; /* Underline on hover for better UX */
+}
+
+.thumbnail {
+	max-width: 200px; /* Thumbnail size */
+	margin-left: 10px; /* Space between thumbnail and full image */
+}
+
+.fullImage {
+	max-width: 400px; /* Limit full image size */
+	width: 100%; /* Ensure full image takes full width of its container */
+}
+
+
